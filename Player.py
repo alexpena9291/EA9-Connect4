@@ -72,9 +72,36 @@ class AIPlayer:
         RETURNS:
         The utility value for the current board
         """
-       
-       
+
+
+        visited = set()
+
+        def scan_chunk(x, y):
+            if not valid_location(x, y):
+                return 0
+            elif (x, y) in visited:
+                return 0
+            elif board[x][y] == 0: #empty adj
+                return 0.5
+            elif board[x][y] != self.player_number:
+                return 0
+
+                        count = 0.07
+            count += 1
+
+            for pair in tuple:
+                count += scan_chunk(x + pair[0], y + pair[1])
+            return count
+        
+        totalCount = 0.0
+        for i in  range(len(board)):
+            for j in range(len(board)):
+                totalCount += scan_chunk(i, j)
+
+        return totalCount
+
         return 0
+    
 
 
 class RandomPlayer:
