@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 class AIPlayer:
     def __init__(self, player_number):
@@ -49,8 +50,41 @@ class AIPlayer:
         RETURNS:
         The 0 based index of the column that represents the next move
         """
-        raise NotImplementedError('Whoops I don\'t know what to do')
+        startTime = time.time()
 
+        def expectimax(is_max, currDepth, board):
+            if currDepth == 2:
+                return evaluation_function(board)
+            if is_max:
+                maxEval = 0
+                for loc in self.get_next_possible_moves(board):
+                    board[loc[0], loc[1]] = self.player_number
+                    val = expectimax(False, currDepth + 1, board)
+                    if val > maxEval:
+                        maxEval = val
+                    board[loc[0], loc[1]] = 0
+            else: 
+                count = 0
+                total = 0
+                for loc in self.get_next_possible_moves(board):
+                    count += 1
+                    board[loc[0], loc[1]] = (2 if self.player_number == 1 else 1)
+                    total += expectimax(True, currDepth + 1, board)
+                    board[loc[0], loc[1]] = 0
+                return total / count
+        
+        nextMoves = self.get_next_possible_moves(board)
+        col = nextMoves[0][1]
+        currentBest = 0
+        for move in nextMoves:
+            board[move[0], move[1]] = self.player_number
+            val = expectimax(False, currDepth + 1, board)
+            if val > maxEval:
+                currentBest = val
+                col = move[1]
+            board[move[0], move[1]] = 0
+
+        return col
 
 
 
@@ -76,31 +110,47 @@ class AIPlayer:
 
         visited = set()
 
+        """
+        Recursive function to process chunks. 
+        """
         def scan_chunk(x, y):
-            if not valid_location(x, y):
-                return 0
-            elif (x, y) in visited:
-                return 0
-            elif board[x][y] == 0: #empty adj
-                return 0.5
-            elif board[x][y] != self.player_number:
+
+            if not valid_location(x, y) or (x, y) in visited:
                 return 0
 
-                        count = 0.07
-            count += 1
+            visited.add((x, y))
 
-            for pair in tuple:
-                count += scan_chunk(x + pair[0], y + pair[1])
-            return count
+            if board[x, y] == 0: #empty adj
+                return 1
+
+            if board[x, y] != self.player_number:
+                return 0
+            else:
+                count = 2
+                for i in range(-1, 2, 1):
+                    for j in range(-1, 2 ,1):
+                        count += scan_chunk(x + i, y + j)
+                return count
         
-        totalCount = 0.0
+
+        totalCount = 0
         for i in  range(len(board)):
-            for j in range(len(board)):
+            for j in range(len(board[i])): #Can speed up
                 totalCount += scan_chunk(i, j)
 
         return totalCount
 
-        return 0
+
+    def get_next_possible_moves(self, board):
+        possiblePlaces = []
+        for i in range(len(board[0])):
+            for j in range(len(board) - 1, -1, -1):
+                if board[j, i] == 0:
+                    possiblePlaces.append((j, i))
+                    break
+        return possiblePlaces
+
+
     
 
 
