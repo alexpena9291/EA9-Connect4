@@ -1,5 +1,7 @@
 import numpy as np
 import random
+import time
+
 class AIPlayer:
     def __init__(self, player_number):
         self.player_number = player_number
@@ -135,8 +137,44 @@ class AIPlayer:
         RETURNS:
         The 0 based index of the column that represents the next move
         """
-        raise NotImplementedError('Whoops I don\'t know what to do')
+        startTime = time.time()
 
+        def expectimax(is_max, currDepth, board):
+            if currDepth == 4:
+                #print('D: ', currDepth, ' eval: ', self.evaluation_function(board))
+                enemyPlayer = (1 if self.player_number == 2 else 2)
+                return self.eval2(self.player_number, board) - self.eval2(enemyPlayer, board)
+            if is_max:
+                maxEval = 0
+                for loc in self.get_next_possible_moves(board):
+                    board[loc[0], loc[1]] = self.player_number
+                    val = expectimax(False, currDepth + 1, board)
+                    if val > maxEval:
+                        maxEval = val
+                    board[loc[0], loc[1]] = 0
+                return maxEval
+            else: 
+                count = 0
+                total = 0
+                for loc in self.get_next_possible_moves(board):
+                    count += 1
+                    board[loc[0], loc[1]] = (2 if self.player_number == 1 else 1)
+                    total += expectimax(True, currDepth + 1, board)
+                    board[loc[0], loc[1]] = 0
+                return total / count
+        
+        nextMoves = self.get_next_possible_moves(board)
+        col = nextMoves[0][1]
+        currentBest = 0
+        for move in nextMoves:
+            board[move[0], move[1]] = self.player_number
+            val = expectimax(False, 0, board)
+            if val > currentBest:
+                currentBest = val
+                col = move[1]
+            board[move[0], move[1]] = 0
+
+        return col
 
     def game_completed(self, player_num, board):
         """Returns True if player_num is in a winning position on the gameboard"""
@@ -242,6 +280,27 @@ class AIPlayer:
 
         return evalCount
 
+
+
+
+    def get_next_possible_moves(self, board):
+        possiblePlaces = []
+        for i in range(len(board[0])):
+            for j in range(len(board) - 1, -1, -1):
+                if board[j, i] == 0:
+                    possiblePlaces.append((j, i))
+                    break
+        return possiblePlaces
+
+    def valid_location(self, x, y):
+        if x > 5 or x < 0:
+            return False
+        if y > 6 or y < 0:
+            return False
+        return True
+
+
+    
 
 
 class RandomPlayer:
