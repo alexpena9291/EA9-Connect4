@@ -57,8 +57,7 @@ class Game:
                 if self.players[int(not self.current_turn)].type == 'random':
                     p_func = current_player.get_expectimax_move
                 else:
-                    #p_func = current_player.get_alpha_beta_move
-                    p_func = current_player.get_expectimax_move
+                    p_func = current_player.get_alpha_beta_move
 
                 try:
                     recv_end, send_end = mp.Pipe(False)

@@ -57,7 +57,7 @@ class AIPlayer:
                     board[row][col] = player
                     if (self.game_completed(player, board)):
                         return col
-                    eval = self.minimax(board, 5 + (moves // 14), alpha, beta, nPlayer)
+                    eval = self.minimax(board, 4 + (moves // 14), alpha, beta, nPlayer)
                     board[row][col] = 0
                     #print ("Col : " + str(col) + " Row : " + str(row) + " Eval : " + str(eval))
                     if (eval >= maxEval):
@@ -143,7 +143,12 @@ class AIPlayer:
             if currDepth == 4:
                 #print('D: ', currDepth, ' eval: ', self.evaluation_function(board))
                 enemyPlayer = (1 if self.player_number == 2 else 2)
-                return self.eval2(self.player_number, board) - self.eval2(enemyPlayer, board)
+                total = self.evaluation_function(board, self.player_number)
+                if self.game_completed(self.player_number, board):
+                    total += 50
+                if self.game_completed(enemyPlayer, board):
+                    total -= 50
+                return total
             if is_max:
                 maxEval = 0
                 for loc in self.get_next_possible_moves(board):
