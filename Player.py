@@ -83,7 +83,7 @@ class AIPlayer:
                     board[row][col] = player
                     if (self.game_completed(player, board)):
                         return col
-                    eval = self.minimax(board, self.target_depth + (moves // 14), alpha, beta, nPlayer)
+                    eval = self.minimax(board, self.target_depth, alpha, beta, nPlayer)
                     board[row][col] = 0
                     #print ("Col : " + str(col) + " Row : " + str(row) + " Eval : " + str(eval))
                     if (eval >= maxEval):
@@ -107,7 +107,7 @@ class AIPlayer:
     #Recursive alpha beta minimax algorithm
     def minimax(self, board, depth, alpha, beta, player):
         if (depth == 0):
-            return self.evaluation_function(board, player)
+            return self.evaluation_function(board)
         if (player == 1):
             if (self.game_completed(2, board)):
                 return -50
