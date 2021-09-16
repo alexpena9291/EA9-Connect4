@@ -53,8 +53,10 @@ class AIPlayer:
         startTime = time.time()
 
         def expectimax(is_max, currDepth, board):
-            if currDepth == 2:
-                return evaluation_function(board)
+            if currDepth == 4:
+                #print('D: ', currDepth, ' eval: ', self.evaluation_function(board))
+                enemyPlayer = (1 if self.player_number == 2 else 2)
+                return self.eval2(self.player_number, board) - self.eval2(enemyPlayer, board)
             if is_max:
                 maxEval = 0
                 for loc in self.get_next_possible_moves(board):
@@ -63,6 +65,7 @@ class AIPlayer:
                     if val > maxEval:
                         maxEval = val
                     board[loc[0], loc[1]] = 0
+                return maxEval
             else: 
                 count = 0
                 total = 0
@@ -78,8 +81,8 @@ class AIPlayer:
         currentBest = 0
         for move in nextMoves:
             board[move[0], move[1]] = self.player_number
-            val = expectimax(False, currDepth + 1, board)
-            if val > maxEval:
+            val = expectimax(False, 0, board)
+            if val > currentBest:
                 currentBest = val
                 col = move[1]
             board[move[0], move[1]] = 0
@@ -113,32 +116,8 @@ class AIPlayer:
         """
         Recursive function to process chunks. 
         """
-        def scan_chunk(x, y):
 
-            if not valid_location(x, y) or (x, y) in visited:
-                return 0
 
-            visited.add((x, y))
-
-            if board[x, y] == 0: #empty adj
-                return 1
-
-            if board[x, y] != self.player_number:
-                return 0
-            else:
-                count = 2
-                for i in range(-1, 2, 1):
-                    for j in range(-1, 2 ,1):
-                        count += scan_chunk(x + i, y + j)
-                return count
-        
-
-        totalCount = 0
-        for i in  range(len(board)):
-            for j in range(len(board[i])): #Can speed up
-                totalCount += scan_chunk(i, j)
-
-        return totalCount
 
 
     def get_next_possible_moves(self, board):
@@ -149,6 +128,13 @@ class AIPlayer:
                     possiblePlaces.append((j, i))
                     break
         return possiblePlaces
+
+    def valid_location(self, x, y):
+        if x > 5 or x < 0:
+            return False
+        if y > 6 or y < 0:
+            return False
+        return True
 
 
     

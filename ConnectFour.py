@@ -15,10 +15,10 @@ def turn_worker(board, send_end, p_func):
 
 
 class Game:
-"""Sets up and manages a game of Connect 4 including turns and graphics.
+    """Sets up and manages a game of Connect 4 including turns and graphics.
 
-    Each turn is executed in a mp.Process to keep the main ui thread available
-"""
+        Each turn is executed in a mp.Process to keep the main ui thread available
+    """
     def __init__(self, player1, player2, time):
         self.players = [player1, player2]
         self.colors = ['yellow', 'red']
@@ -57,7 +57,8 @@ class Game:
                 if self.players[int(not self.current_turn)].type == 'random':
                     p_func = current_player.get_expectimax_move
                 else:
-                    p_func = current_player.get_alpha_beta_move
+                    #p_func = current_player.get_alpha_beta_move
+                    p_func = current_player.get_expectimax_move
 
                 try:
                     recv_end, send_end = mp.Pipe(False)
