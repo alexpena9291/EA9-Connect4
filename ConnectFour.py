@@ -156,7 +156,7 @@ def main(player1, player2, time):
     """
     def make_player(name, num):
         if name=='ai':
-            return AIPlayer(num)
+            return AIPlayer(num, time)
         elif name=='random':
             return RandomPlayer(num)
         elif name=='human':
@@ -173,7 +173,7 @@ if __name__=='__main__':
     parser.add_argument('player2', choices=player_types)
     parser.add_argument('--time',
                         type=int,
-                        default=60,
+                        default=10,
                         help='Time to wait for a move in seconds (int)')
     args = parser.parse_args()
 

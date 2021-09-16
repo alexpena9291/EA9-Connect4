@@ -3,10 +3,32 @@ import random
 import time
 
 class AIPlayer:
-    def __init__(self, player_number):
+    def __init__(self, player_number, max_time = 5):
         self.player_number = player_number
         self.type = 'ai'
         self.player_string = 'Player {}:ai'.format(player_number)
+        self.target_depth = self.get_target_depth(max_time)
+
+
+    def get_target_depth(self, max_time):
+        dummy_board = np.zeros([6,7]).astype(np.uint8)
+        for i in range(6):
+            for j in range(7):
+                dummy_board[i, j] = random.randint(0,2)
+        start_time = time.time()
+        self.evaluation_function(dummy_board)
+        self.game_completed(1, dummy_board)
+        self.game_completed(2, dummy_board)
+        total_time = time.time() - start_time 
+        possible_evals = int(float(max_time) / total_time)
+        depth = 0
+        while pow(7, depth) < possible_evals:
+            depth += 1
+        print('PerE: ', total_time)
+        print('PosE: ', possible_evals)
+        print('D:', depth - 1)
+        return depth - 1
+
 
     def get_alpha_beta_move(self, board):
         """
@@ -57,7 +79,7 @@ class AIPlayer:
                     board[row][col] = player
                     if (self.game_completed(player, board)):
                         return col
-                    eval = self.minimax(board, 4 + (moves // 14), alpha, beta, nPlayer)
+                    eval = self.minimax(board, self.target_depth + (moves // 14), alpha, beta, nPlayer)
                     board[row][col] = 0
                     #print ("Col : " + str(col) + " Row : " + str(row) + " Eval : " + str(eval))
                     if (eval >= maxEval):
@@ -140,10 +162,11 @@ class AIPlayer:
         startTime = time.time()
 
         def expectimax(is_max, currDepth, board):
-            if currDepth == 4:
+            if currDepth == self.target_depth - 1:
                 #print('D: ', currDepth, ' eval: ', self.evaluation_function(board))
+                flip_flop = (1 if self.player_num == 1 else -1)
                 enemyPlayer = (1 if self.player_number == 2 else 2)
-                total = self.evaluation_function(board, self.player_number)
+                total = flip_flop * self.evaluation_function(board)
                 if self.game_completed(self.player_number, board):
                     total += 50
                 if self.game_completed(enemyPlayer, board):
@@ -261,7 +284,7 @@ class AIPlayer:
                 check_diagonal(board))
 
 
-    def evaluation_function(self, board, player):
+    def evaluation_function(self, board):
         """
         Given the current stat of the board, return the scalar value that
         represents the evaluation function for the current player
@@ -279,7 +302,7 @@ class AIPlayer:
         RETURNS:
         The utility value for the current board
         """
-        evalCount = 0
+        evalCount = 0 #Make compatible
         evalCount += self.check_three(1, board)
         evalCount -= self.check_three(2, board)
 
