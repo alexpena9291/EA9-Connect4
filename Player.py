@@ -12,19 +12,23 @@ class AIPlayer:
 
     def get_target_depth(self, max_time):
         dummy_board = np.zeros([6,7]).astype(np.uint8)
-        for i in range(6):
-            for j in range(7):
-                dummy_board[i, j] = random.randint(0,2)
-        start_time = time.time()
-        self.evaluation_function(dummy_board)
-        self.game_completed(1, dummy_board)
-        self.game_completed(2, dummy_board)
-        total_time = time.time() - start_time 
-        possible_evals = int(float(max_time) / total_time)
+        total_time = 0
+        for i in range(10):
+            for i in range(6):
+                for j in range(7):
+                    dummy_board[i, j] = random.randint(0,2)
+            start_time = time.time()
+            self.evaluation_function(dummy_board)
+            self.game_completed(1, dummy_board)
+            self.game_completed(2, dummy_board)
+            print(time.time() - start_time)
+            total_time += time.time() - start_time
+        average_time = total_time / 10.0
+        possible_evals = int(float(max_time) / average_time)
         depth = 0
         while pow(7, depth) < possible_evals:
             depth += 1
-        print('PerE: ', total_time)
+        print('PerE: ', average_time)
         print('PosE: ', possible_evals)
         print('D:', depth - 1)
         return depth - 1
