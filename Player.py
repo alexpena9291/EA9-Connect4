@@ -167,17 +167,12 @@ class AIPlayer:
 
         def expectimax(is_max, currDepth, board):
             if currDepth == self.target_depth - 1:
-                #print('D: ', currDepth, ' eval: ', self.evaluation_function(board))
-                flip_flop = (1 if self.player_num == 1 else -1)
-                enemyPlayer = (1 if self.player_number == 2 else 2)
-                total = flip_flop * self.evaluation_function(board)
-                if self.game_completed(self.player_number, board):
-                    total += 50
-                if self.game_completed(enemyPlayer, board):
-                    total -= 50
+                total = self.expEval_function(board, self.player_number)
                 return total
             if is_max:
                 maxEval = 0
+                if self.game_completed(self.player_number, board):
+                    return 50
                 for loc in self.get_next_possible_moves(board):
                     board[loc[0], loc[1]] = self.player_number
                     val = expectimax(False, currDepth + 1, board)
@@ -185,12 +180,15 @@ class AIPlayer:
                         maxEval = val
                     board[loc[0], loc[1]] = 0
                 return maxEval
-            else: 
+            else:
                 count = 0
                 total = 0
+                enemyPlayer = (1 if self.player_number == 2 else 2)
+                if self.game_completed(enemyPlayer, board):
+                    return -50
                 for loc in self.get_next_possible_moves(board):
                     count += 1
-                    board[loc[0], loc[1]] = (2 if self.player_number == 1 else 1)
+                    board[loc[0], loc[1]] = enemyPlayer
                     total += expectimax(True, currDepth + 1, board)
                     board[loc[0], loc[1]] = 0
                 return total / count
@@ -287,6 +285,12 @@ class AIPlayer:
                 check_verticle(board) +
                 check_diagonal(board))
 
+    def expEval_function(self, board, maximizingPlayer):
+        evalCount = 0
+        evalCount += self.check_three(maximizingPlayer, board)
+        evalCount -= self.check_three((1 if maximizingPlayer == 2 else 2), board)
+
+        return evalCount
 
     def evaluation_function(self, board):
         """
